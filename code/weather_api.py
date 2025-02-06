@@ -1,8 +1,10 @@
 import openmeteo_requests
-
 import requests_cache
 import pandas as pd
 from retry_requests import retry
+import boto3
+import time
+from io import StringIO
 
 # Setup the Open-Meteo API client with cache and retry on error
 cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
@@ -13,12 +15,12 @@ openmeteo = openmeteo_requests.Client(session = retry_session)
 # The order of variables in hourly or daily is important to assign them correctly below
 url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 params = {
-	"latitude": 6.9355,
-	"longitude": 79.8487,
-	"start_date": "2021-03-24",
-	"end_date": "2025-02-02",
-	"daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "daylight_duration", "sunshine_duration", "uv_index_max", "uv_index_clear_sky_max", "precipitation_sum", "rain_sum", "showers_sum", "snowfall_sum", "precipitation_hours", "precipitation_probability_max", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant", "shortwave_radiation_sum", "et0_fao_evapotranspiration"],
-	"timezone": "auto"
+    "latitude": 6.9355,
+    "longitude": 79.8487,
+    "start_date": "2021-03-24",
+    "end_date": "2025-02-02",
+    "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "daylight_duration", "sunshine_duration", "uv_index_max", "uv_index_clear_sky_max", "precipitation_sum", "rain_sum", "showers_sum", "snowfall_sum", "precipitation_hours", "precipitation_probability_max", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant", "shortwave_radiation_sum", "et0_fao_evapotranspiration"],
+    "timezone": "auto"
 }
 responses = openmeteo.weather_api(url, params=params)
 
@@ -55,10 +57,10 @@ daily_shortwave_radiation_sum = daily.Variables(20).ValuesAsNumpy()
 daily_et0_fao_evapotranspiration = daily.Variables(21).ValuesAsNumpy()
 
 daily_data = {"date": pd.date_range(
-	start = pd.to_datetime(daily.Time(), unit = "s", utc = True),
-	end = pd.to_datetime(daily.TimeEnd(), unit = "s", utc = True),
-	freq = pd.Timedelta(seconds = daily.Interval()),
-	inclusive = "left"
+    start = pd.to_datetime(daily.Time(), unit = "s", utc = True),
+    end = pd.to_datetime(daily.TimeEnd(), unit = "s", utc = True),
+    freq = pd.Timedelta(seconds = daily.Interval()),
+    inclusive = "left"
 )}
 
 daily_data["weather_code"] = daily_weather_code
@@ -87,6 +89,21 @@ daily_data["et0_fao_evapotranspiration"] = daily_et0_fao_evapotranspiration
 daily_dataframe = pd.DataFrame(data = daily_data)
 print(daily_dataframe)
 
-# Save the dataframe to a CSV file
-daily_dataframe.to_csv('daily_weather_data.csv', index=False)
+# Configure S3 client (Ensure the correct AWS region and credentials)
+s3_client = boto3.client('s3', region_name='us-west-2')  # Change region if needed
+bucket_name = 'principles-of-datascience'  # Replace with your actual S3 bucket name
+folder_path = 'weather-data/'  # Folder path in S3
 
+# Generate a unique file name (use a timestamp to avoid overwriting)
+timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+s3_file_name = f'{folder_path}daily_weather_data_{timestamp}.csv'
+
+# Save the dataframe directly to S3 as a CSV file
+csv_buffer = StringIO()  # Create an in-memory string buffer
+daily_dataframe.to_csv(csv_buffer, index=False)
+csv_buffer.seek(0)  # Go to the start of the buffer
+
+# Upload the CSV file to S3
+s3_client.put_object(Bucket=bucket_name, Key=s3_file_name, Body=csv_buffer.getvalue())
+
+print(f"Data uploaded to S3: s3://{bucket_name}/{s3_file_name}")
