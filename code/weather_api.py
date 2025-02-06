@@ -11,7 +11,6 @@ cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
-# Make sure all required weather variables are listed here
 # The order of variables in hourly or daily is important to assign them correctly below
 url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 params = {
@@ -24,14 +23,14 @@ params = {
 }
 responses = openmeteo.weather_api(url, params=params)
 
-# Process first location. Add a for-loop for multiple locations or weather models
+# Process first location
 response = responses[0]
 print(f"Coordinates {response.Latitude()}°N {response.Longitude()}°E")
 print(f"Elevation {response.Elevation()} m asl")
 print(f"Timezone {response.Timezone()} {response.TimezoneAbbreviation()}")
 print(f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s")
 
-# Process daily data. The order of variables needs to be the same as requested.
+# Process daily data
 daily = response.Daily()
 daily_weather_code = daily.Variables(0).ValuesAsNumpy()
 daily_temperature_2m_max = daily.Variables(1).ValuesAsNumpy()
@@ -89,19 +88,19 @@ daily_data["et0_fao_evapotranspiration"] = daily_et0_fao_evapotranspiration
 daily_dataframe = pd.DataFrame(data = daily_data)
 print(daily_dataframe)
 
-# Configure S3 client (Ensure the correct AWS region and credentials)
-s3_client = boto3.client('s3', region_name='us-west-2')  # Change region if needed
-bucket_name = 'principles-of-datascience'  # Replace with your actual S3 bucket name
-folder_path = 'weather-data/'  # Folder path in S3
+# Configure S3 client
+s3_client = boto3.client('s3', region_name='us-east-1')
+bucket_name = 'principles-of-datascience'
+folder_path = 'weather-data/'
 
-# Generate a unique file name (use a timestamp to avoid overwriting)
+# Generate a unique file name
 timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
 s3_file_name = f'{folder_path}daily_weather_data_{timestamp}.csv'
 
 # Save the dataframe directly to S3 as a CSV file
-csv_buffer = StringIO()  # Create an in-memory string buffer
+csv_buffer = StringIO()
 daily_dataframe.to_csv(csv_buffer, index=False)
-csv_buffer.seek(0)  # Go to the start of the buffer
+csv_buffer.seek(0)
 
 # Upload the CSV file to S3
 s3_client.put_object(Bucket=bucket_name, Key=s3_file_name, Body=csv_buffer.getvalue())
