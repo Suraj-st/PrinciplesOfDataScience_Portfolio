@@ -24,18 +24,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "dev",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/Administrator/Documents/GitHub/PrinciplesOfDataScience_Portfolio/Individual_Question_02"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Administrator\Documents\GitHub\PrinciplesOfDataScience_Portfolio\Individual_Question_02" />
       <recent name="C:\Users\Administrator\Documents\GitHub\PrinciplesOfDataScience_Portfolio\code" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Administrator\Documents\GitHub\PrinciplesOfDataScience_Portfolio\Individual_Question_01" />
       <recent name="C:\Users\Administrator\Documents\GitHub\PrinciplesOfDataScience_Portfolio" />
     </key>
   </component>
