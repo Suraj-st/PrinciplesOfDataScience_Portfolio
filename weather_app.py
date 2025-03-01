@@ -72,18 +72,18 @@ weather_df = scaler.fit_transform(weather_data)
 
 weather_df = weather_df[:1]
 
-# Center the button using markdown and CSS
-st.markdown(
-    """
-    <style>
-    .center-button {
-        display: flex;
-        justify-content: center;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# # Center the button using markdown and CSS
+# st.markdown(
+#     """
+#     <style>
+#     .center-button {
+#         display: flex;
+#         justify-content: center;
+#     }
+#     </style>
+#     """,
+#     unsafe_allow_html=True
+# )
 
 # Create a container for centering
 col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
