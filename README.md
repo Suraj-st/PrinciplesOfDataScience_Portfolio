@@ -16,6 +16,6 @@ Analysis, Model development and tracking: https://github.com/Suraj-st/Principles
 Deployment via Streamlit: https://github.com/Suraj-st/PrinciplesOfDataScience_Portfolio/blob/main/Individual_Question_01/weather_app.py
 
 ### Question 2
-Analyzed the Yahoo's declined based on data provided by the apha-vantage API
+Analyzed the Yahoo's declined based on data provided by the alpha_vantage API
 
 https://github.com/Suraj-st/PrinciplesOfDataScience_Portfolio/tree/main/Individual_Question_02
