@@ -1,4 +1,4 @@
-# PrinciplesOfDataScience_Portfolio
+# PrinciplesOfDataScience Portfolio -  Individual
 
 Principles of Data Science Port folio Individual
 
